@@ -1,15 +1,12 @@
 import {
   React,
   FormattedMessage,
-  css,
-  jsx,
   Immutable,
   IMFieldSchema,
   UseDataSource,
   DataSourceManager,
-  dataSourceUtils,
   QueriableDataSource,
-  LoadableDataSource,
+  styled,
 } from 'jimu-core'
 import { AllWidgetSettingProps } from 'jimu-for-builder'
 import { Switch } from 'jimu-ui'
@@ -24,17 +21,12 @@ import defaultMessages from './translations/default'
 import {
   DataSourceSelector,
   AllDataSourceTypes,
-  FieldSelector,
 } from 'jimu-ui/advanced/data-source-selector'
-import { JimuMapView } from 'jimu-arcgis'
-import {
-  MapDataSourceImpl,
-  WebMapDataSourceImpl,
-} from 'jimu-arcgis/lib/data-sources'
+import { WebMapDataSourceImpl } from 'jimu-arcgis/lib/data-sources'
+
+export var layersList = []
 
 export default function Setting(props: AllWidgetSettingProps<IMConfig>) {
-  //or <{}> inside
-
   const onZoomToLayerPropertyChange = (
     evt: React.FormEvent<HTMLInputElement>
   ) => {
@@ -76,27 +68,7 @@ export default function Setting(props: AllWidgetSettingProps<IMConfig>) {
     })
   }
 
-  //for adding the list of urls to the widget----------------------------------------------------------
-  // need to:
-
-  console.log('props:', props)
-  // const printLayers = (jmv: JimuMapView): void => {
-  //   if (!jmv) return
-  //   const layers = (jmv.view.map.layers as any)?.items
-  //   let array = []
-  //   layers.forEach((layer) => {
-  //     if (layer && layer.timeInfo) {
-  //       const layerUrl = dataSourceUtils.getUrlByLayer(layer)
-  //       array.push(layerUrl)
-  //       console.log(layerUrl)
-  //     }
-  //   })
-  // }
-
-  //https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Trailheads_Styled/FeatureServer/0
-  //-------------------------------------------------------------------------------------
-
-  const style = css`
+  const StyleDiv = styled.div`
     .widget-setting-addLayers {
       .checkbox-row {
         display: flex;
@@ -105,8 +77,6 @@ export default function Setting(props: AllWidgetSettingProps<IMConfig>) {
       }
     }
   `
-  // const [list, setList] = React.useState([])
-  var layers = []
 
   if (
     props.useDataSources != undefined &&
@@ -126,40 +96,39 @@ export default function Setting(props: AllWidgetSettingProps<IMConfig>) {
     if (mapDataSource && mapDataSource.isDataSourceSet) {
       //check Whether a data source contains child data sources
       const dataSourceChildren = mapDataSource.getChildDataSources()
-      console.log('the child data source---->', dataSourceChildren)
-      // var layers: any[]
-      console.log('empty list', layers)
+      // console.log('the child data source---->', dataSourceChildren)
       for (var i = 0; i < dataSourceChildren.length; i++) {
-        const id = (dataSourceChildren[i] as QueriableDataSource).getJimuChildId
-        //get url from
-        mapDataSource.getDataSourceByLayer(id)
+        const childId = dataSourceChildren[i].id
+        // console.log('dataSourceChildren[i]', dataSourceChildren[i])
+        // console.log('Childid:', childId)
+        const startIndex = childId.indexOf('-')
+        const idInput = childId.slice(startIndex + 1)
 
-        //push code to github
-        //download version 1.4
-        //navigate to client and server
-        //run npm ci to install
-        //copy and paste add-layers folder to new project
-
-        layers.push(url)
+        //get url
+        if (idInput !== undefined && mapDataSource !== undefined) {
+          const newUrl = (mapDataSource.getDataSourceByLayer(
+            idInput
+          ) as QueriableDataSource).url
+          layersList.push(newUrl)
+          // console.log(newUrl)
+        }
+        // console.log('final layers', layers)
       }
     } else {
       const message =
         'Datasource does not contain child data sources. No layers to add'
-      layers.push(message)
-      layers.map((item) => <li key={item.id}>{item.name}</li>)
-
-      console.log(message)
+      layersList.push(message)
+      layersList.map((item) => <li key={item.id}>{item.name}</li>)
     }
   } else {
     const message = 'This is an undefined datasource'
-    layers.push(message)
-    console.log(message)
+    layersList.push(message)
   }
-  console.log('layers:', layers)
+  console.log('finall layers including messages:', layersList)
   //then export layers variable to widget to load
 
   return (
-    <div css={style}>
+    <StyleDiv>
       <div className='widget-setting-addLayers'>
         <SettingSection
           className='map-selector-section'
@@ -211,7 +180,8 @@ export default function Setting(props: AllWidgetSettingProps<IMConfig>) {
             widgetId={props.id}
           />
         </div>
+        <p>{layersList}</p>
       </div>
-    </div>
+    </StyleDiv>
   )
 }

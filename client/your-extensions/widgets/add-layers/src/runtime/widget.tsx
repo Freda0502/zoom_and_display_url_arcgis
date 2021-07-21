@@ -1,4 +1,4 @@
-import { React, AllWidgetProps, css, jsx, UseDataSource } from 'jimu-core'
+import { React, AllWidgetProps, styled } from 'jimu-core'
 import {
   loadArcGISJSAPIModules,
   JimuMapViewComponent,
@@ -8,32 +8,24 @@ import {
 import { useState, useEffect } from 'react'
 import { IMConfig } from '../config'
 import defaultMessages from './translations/default'
+import * as lang from 'esri/core/lang'
 import * as FeatureLayer from 'esri/layers/FeatureLayer'
-import lang = require('esri/core/lang')
-import SpatialReference = require('esri/geometry/SpatialReference')
-import Query = require('esri/tasks/support/Query')
-// import {dataSourceSelected} from '../setting/setting'
+import * as SpatialReference from 'esri/geometry/SpatialReference'
+import * as Query from 'esri/tasks/support/Query'
+import layersList from '../setting/setting'
 
 export default function (props: AllWidgetProps<IMConfig>) {
   const [jimuMapView, setJimuMapView] = useState<any>(null)
   const [featureServiceUrlInput, setFeatureServiceUrlInput] = useState<string>(
     ''
   )
-  console.log('datasources in widget.tsx', props.useDataSources)
+  console.log('layers', layersList)
 
   const activeViewChangeHandler = (jmv: JimuMapView) => {
     if (jmv) {
       setJimuMapView(jmv)
     }
   }
-  // Give types to the modules we import from the ArcGIS API for JavaScript
-  // to tell TypeScript what types they are.
-  // FeatureLayer: typeof __esri.FeatureLayer
-  // Query: typeof __esri.Query
-  // SpatialReference: typeof __esri.SpatialReference
-
-  // Every time the input box value changes, this function gets called.
-  // We set our component's state so we can use the value in the formSubmit function.
 
   const handleFeatureServiceUrlInputChange = (event) => {
     setFeatureServiceUrlInput(event.target.value)
@@ -55,10 +47,6 @@ export default function (props: AllWidgetProps<IMConfig>) {
       return
     }
 
-    // Lazy-loading (only load if/when needed) the ArcGIS API for JavaScript modules
-    // that we need - only once the "Add Layer" button is pressed.
-    // useEffect(()=>{
-    // })
     loadArcGISJSAPIModules([
       'esri/layers/FeatureLayer',
       'esri/tasks/support/Query',
@@ -88,14 +76,6 @@ export default function (props: AllWidgetProps<IMConfig>) {
           query.outSpatialReference = new SpatialReference({
             wkid: 102100,
           })
-
-          // layer
-          //   .when(() => {
-          //     return layer.queryExtent(query)
-          //   })
-          //   .then((response) => {
-          //     this.state.jimuMapView.view.goTo(response.extent)
-          //   })
           console.log('before')
           layer.queryExtent(query).then((results) => {
             jimuMapView.view.extent = results.extent
@@ -108,11 +88,11 @@ export default function (props: AllWidgetProps<IMConfig>) {
       })
 
       const layers = (jimuMapView.view.map.layers as any)?.items
-      console.log('layers!!!!!!!!!!!', layers)
+      // console.log('layers!!!!!!!!!!!', layers)
     })
   }
 
-  const style = css`
+  const StyleDiv = styled.div`
     form > div {
       display: flex;
       justify-content: space-between;
@@ -125,40 +105,41 @@ export default function (props: AllWidgetProps<IMConfig>) {
     }
   `
   return (
-    <div className='widget-addLayers jimu-widget p-2' css={style}>
-      {props.hasOwnProperty('useMapWidgetIds') &&
-        props.useMapWidgetIds &&
-        props.useMapWidgetIds.length === 1 && (
-          <JimuMapViewComponent
-            useMapWidgetIds={props.useMapWidgetIds}
-            onActiveViewChange={(jmv: JimuMapView) => {
-              if (jmv) {
-                setJimuMapView(jmv)
-              }
-            }}
-          />
-        )}
-      <p>{defaultMessages.instructions}</p>
-
-      <form onSubmit={formSubmit}>
+    <StyleDiv>
+      <div className='widget-addLayers jimu-widget p-2'>
+        {/* css={style} */}
+        {props.hasOwnProperty('useMapWidgetIds') &&
+          props.useMapWidgetIds &&
+          props.useMapWidgetIds.length === 1 && (
+            <JimuMapViewComponent
+              useMapWidgetId={props.useMapWidgetIds[0]}
+              onActiveViewChange={(jmv: JimuMapView) => {
+                if (jmv) {
+                  setJimuMapView(jmv)
+                }
+              }}
+            />
+          )}
+        <p>{defaultMessages.instructions}</p>
+        <form onSubmit={formSubmit}>
+          <div>
+            <input
+              type='text'
+              placeholder={defaultMessages.featureServiceUrl}
+              value={featureServiceUrlInput}
+              onChange={handleFeatureServiceUrlInputChange}
+            />
+            <button>{defaultMessages.addLayer}</button>
+          </div>
+        </form>
         <div>
-          <input
-            type='text'
-            placeholder={defaultMessages.featureServiceUrl}
-            value={featureServiceUrlInput}
-            onChange={handleFeatureServiceUrlInputChange}
-          />
-          <button>{defaultMessages.addLayer}</button>
-        </div>
-      </form>
-
-      <div>
-        {/* {props.items.map((item, index) => (
+          {/* {props.items.map((item, index) => (
           <Item key={index} item={item} />
         ))} */}
-        URLs to layers in the selected datasource:
+          URLs to layers in the selected datasource:
+        </div>
+        <p>{layersList}</p>
       </div>
-      {/* <p>{layers}</p> */}
-    </div>
+    </StyleDiv>
   )
 }
