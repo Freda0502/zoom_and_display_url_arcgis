@@ -8,24 +8,14 @@ import {
 import { useState, useEffect } from 'react'
 import { IMConfig } from '../config'
 import defaultMessages from './translations/default'
-import * as lang from 'esri/core/lang'
-import * as FeatureLayer from 'esri/layers/FeatureLayer'
-import * as SpatialReference from 'esri/geometry/SpatialReference'
-import * as Query from 'esri/tasks/support/Query'
-import layersList from '../setting/setting'
+import { layersList } from '../setting/setting'
 
 export default function (props: AllWidgetProps<IMConfig>) {
   const [jimuMapView, setJimuMapView] = useState<any>(null)
   const [featureServiceUrlInput, setFeatureServiceUrlInput] = useState<string>(
     ''
   )
-  console.log('layers', layersList)
-
-  const activeViewChangeHandler = (jmv: JimuMapView) => {
-    if (jmv) {
-      setJimuMapView(jmv)
-    }
-  }
+  console.log('layersList imported', layersList)
 
   const handleFeatureServiceUrlInputChange = (event) => {
     setFeatureServiceUrlInput(event.target.value)
@@ -138,7 +128,7 @@ export default function (props: AllWidgetProps<IMConfig>) {
         ))} */}
           URLs to layers in the selected datasource:
         </div>
-        <p>{layersList}</p>
+        <p>{layersList[0]}</p>
       </div>
     </StyleDiv>
   )

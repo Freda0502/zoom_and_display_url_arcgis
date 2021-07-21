@@ -2,7 +2,6 @@ import {
   React,
   FormattedMessage,
   Immutable,
-  IMFieldSchema,
   UseDataSource,
   DataSourceManager,
   QueriableDataSource,
@@ -24,7 +23,7 @@ import {
 } from 'jimu-ui/advanced/data-source-selector'
 import { WebMapDataSourceImpl } from 'jimu-arcgis/lib/data-sources'
 
-export var layersList = []
+var layersList = []
 
 export default function Setting(props: AllWidgetSettingProps<IMConfig>) {
   const onZoomToLayerPropertyChange = (
@@ -40,17 +39,6 @@ export default function Setting(props: AllWidgetSettingProps<IMConfig>) {
     props.onSettingChange({
       id: props.id,
       useMapWidgetIds: useMapWidgetIds,
-    })
-  }
-  const onFieldChange = (allSelectedFields: IMFieldSchema[]) => {
-    props.onSettingChange({
-      id: props.id,
-      useDataSources: [
-        {
-          ...props.useDataSources[0],
-          ...{ fields: allSelectedFields.map((f) => f.jimuName) },
-        },
-      ],
     })
   }
 
@@ -77,30 +65,19 @@ export default function Setting(props: AllWidgetSettingProps<IMConfig>) {
       }
     }
   `
-
   if (
     props.useDataSources != undefined &&
     props.useDataSources[0] != undefined
   ) {
-    console.log('data source 0:', props.useDataSources[0])
-    console.log(
-      'props.useDataSources[0].fields is:',
-      props.useDataSources[0].fields
-    )
     const id = props.useDataSources[0].mainDataSourceId
-
     const dsManager = DataSourceManager.getInstance()
     const mapDataSource = dsManager.getDataSource(id) as WebMapDataSourceImpl
-    console.log('mapDataSource', mapDataSource)
 
     if (mapDataSource && mapDataSource.isDataSourceSet) {
       //check Whether a data source contains child data sources
       const dataSourceChildren = mapDataSource.getChildDataSources()
-      // console.log('the child data source---->', dataSourceChildren)
       for (var i = 0; i < dataSourceChildren.length; i++) {
         const childId = dataSourceChildren[i].id
-        // console.log('dataSourceChildren[i]', dataSourceChildren[i])
-        // console.log('Childid:', childId)
         const startIndex = childId.indexOf('-')
         const idInput = childId.slice(startIndex + 1)
 
@@ -110,9 +87,7 @@ export default function Setting(props: AllWidgetSettingProps<IMConfig>) {
             idInput
           ) as QueriableDataSource).url
           layersList.push(newUrl)
-          // console.log(newUrl)
         }
-        // console.log('final layers', layers)
       }
     } else {
       const message =
@@ -125,7 +100,6 @@ export default function Setting(props: AllWidgetSettingProps<IMConfig>) {
     layersList.push(message)
   }
   console.log('finall layers including messages:', layersList)
-  //then export layers variable to widget to load
 
   return (
     <StyleDiv>
@@ -185,3 +159,5 @@ export default function Setting(props: AllWidgetSettingProps<IMConfig>) {
     </StyleDiv>
   )
 }
+
+export { layersList }
