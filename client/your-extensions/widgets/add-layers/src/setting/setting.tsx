@@ -25,7 +25,10 @@ import { WebMapDataSourceImpl } from 'jimu-arcgis/lib/data-sources'
 
 var layersList = []
 
+// export default function
+
 export default function Setting(props: AllWidgetSettingProps<IMConfig>) {
+  console.log('props', props)
   const onZoomToLayerPropertyChange = (
     evt: React.FormEvent<HTMLInputElement>
   ) => {
@@ -65,6 +68,10 @@ export default function Setting(props: AllWidgetSettingProps<IMConfig>) {
       }
     }
   `
+  //flag==false: no layers to add
+  // var flag = false
+  // var added = false
+
   if (
     props.useDataSources != undefined &&
     props.useDataSources[0] != undefined
@@ -86,22 +93,32 @@ export default function Setting(props: AllWidgetSettingProps<IMConfig>) {
           const newUrl = (mapDataSource.getDataSourceByLayer(
             idInput
           ) as QueriableDataSource).url
+          // if ((added = true)) {
+          //   layersList = []
+          //   added = false
+          // }
           layersList.push(newUrl)
+          // flag = true
         }
       }
     } else {
+      //if (flag == false)
       const message =
         'Datasource does not contain child data sources. No layers to add'
-      layersList.push(message)
-      layersList.map((item) => <li key={item.id}>{item.name}</li>)
+      // layersList.push(message)
+      console.log(message)
+      // added = true
     }
   } else {
+    // if (flag == false)
     const message = 'This is an undefined datasource'
-    layersList.push(message)
+    console.log(message)
+    // layersList.push(message)
+    // added = true
   }
   console.log('finall layers including messages:', layersList)
 
-  return (
+  return [
     <StyleDiv>
       <div className='widget-setting-addLayers'>
         <SettingSection
@@ -156,8 +173,9 @@ export default function Setting(props: AllWidgetSettingProps<IMConfig>) {
         </div>
         <p>{layersList}</p>
       </div>
-    </StyleDiv>
-  )
+    </StyleDiv>,
+    layersList,
+  ]
 }
 
 export { layersList }

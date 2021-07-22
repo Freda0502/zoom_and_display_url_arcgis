@@ -6,16 +6,24 @@ import {
 } from 'jimu-arcgis'
 
 import { useState, useEffect } from 'react'
-import { IMConfig } from '../config'
 import defaultMessages from './translations/default'
-import { layersList } from '../setting/setting'
+// import { layersList } from '../setting/setting'
+import Setting from '../setting/setting'
 
-export default function (props: AllWidgetProps<IMConfig>) {
+// AllWidgetProps<IMConfig>
+export default function (props: any) {
   const [jimuMapView, setJimuMapView] = useState<any>(null)
   const [featureServiceUrlInput, setFeatureServiceUrlInput] = useState<string>(
     ''
   )
-  console.log('layersList imported', layersList)
+  const lst = [1, 2, 3]
+  console.log('props for function in widget', props)
+  const [htmlElement, listToDisplay] = Setting(props)
+  console.log('layersList imported', listToDisplay)
+  console.log('type', typeof listToDisplay)
+  console.log('type of list', typeof lst)
+  console.log('1st in listToDisplay', listToDisplay[0])
+  console.log('2nd in listToDisplay', listToDisplay[1])
 
   const handleFeatureServiceUrlInputChange = (event) => {
     setFeatureServiceUrlInput(event.target.value)
@@ -78,7 +86,6 @@ export default function (props: AllWidgetProps<IMConfig>) {
       })
 
       const layers = (jimuMapView.view.map.layers as any)?.items
-      // console.log('layers!!!!!!!!!!!', layers)
     })
   }
 
@@ -94,6 +101,10 @@ export default function (props: AllWidgetProps<IMConfig>) {
       }
     }
   `
+  const listItems = listToDisplay.map((link) => (
+    <li key={link.toString()}>{link}</li>
+  ))
+
   return (
     <StyleDiv>
       <div className='widget-addLayers jimu-widget p-2'>
@@ -122,13 +133,10 @@ export default function (props: AllWidgetProps<IMConfig>) {
             <button>{defaultMessages.addLayer}</button>
           </div>
         </form>
-        <div>
-          {/* {props.items.map((item, index) => (
-          <Item key={index} item={item} />
-        ))} */}
-          URLs to layers in the selected datasource:
-        </div>
-        <p>{layersList[0]}</p>
+        <div>URLs to layers in the selected datasource:</div>
+        {/* <p>{listToDisplay[0]}</p>
+        <p>{listToDisplay[1]}</p> */}
+        <p>{listItems}</p>
       </div>
     </StyleDiv>
   )
