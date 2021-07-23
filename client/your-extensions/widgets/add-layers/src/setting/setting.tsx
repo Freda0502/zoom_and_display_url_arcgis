@@ -25,10 +25,7 @@ import { WebMapDataSourceImpl } from 'jimu-arcgis/lib/data-sources'
 
 var layersList = []
 
-// export default function
-
 export default function Setting(props: AllWidgetSettingProps<IMConfig>) {
-  console.log('props', props)
   const onZoomToLayerPropertyChange = (
     evt: React.FormEvent<HTMLInputElement>
   ) => {
@@ -68,9 +65,6 @@ export default function Setting(props: AllWidgetSettingProps<IMConfig>) {
       }
     }
   `
-  //flag==false: no layers to add
-  // var flag = false
-  // var added = false
 
   if (
     props.useDataSources != undefined &&
@@ -81,42 +75,21 @@ export default function Setting(props: AllWidgetSettingProps<IMConfig>) {
     const mapDataSource = dsManager.getDataSource(id) as WebMapDataSourceImpl
 
     if (mapDataSource && mapDataSource.isDataSourceSet) {
-      //check Whether a data source contains child data sources
       const dataSourceChildren = mapDataSource.getChildDataSources()
       for (var i = 0; i < dataSourceChildren.length; i++) {
         const childId = dataSourceChildren[i].id
         const startIndex = childId.indexOf('-')
         const idInput = childId.slice(startIndex + 1)
 
-        //get url
         if (idInput !== undefined && mapDataSource !== undefined) {
           const newUrl = (mapDataSource.getDataSourceByLayer(
             idInput
           ) as QueriableDataSource).url
-          // if ((added = true)) {
-          //   layersList = []
-          //   added = false
-          // }
           layersList.push(newUrl)
-          // flag = true
         }
       }
-    } else {
-      //if (flag == false)
-      const message =
-        'Datasource does not contain child data sources. No layers to add'
-      // layersList.push(message)
-      console.log(message)
-      // added = true
     }
-  } else {
-    // if (flag == false)
-    const message = 'This is an undefined datasource'
-    console.log(message)
-    // layersList.push(message)
-    // added = true
   }
-  console.log('finall layers including messages:', layersList)
 
   return [
     <StyleDiv>
@@ -160,7 +133,6 @@ export default function Setting(props: AllWidgetSettingProps<IMConfig>) {
           </SettingRow>
         </SettingSection>
 
-        {/* datasource selector */}
         <div className='use-feature-layer-setting p-2'>
           <DataSourceSelector
             types={Immutable([AllDataSourceTypes.WebMap])}
@@ -171,7 +143,6 @@ export default function Setting(props: AllWidgetSettingProps<IMConfig>) {
             widgetId={props.id}
           />
         </div>
-        <p>{layersList}</p>
       </div>
     </StyleDiv>,
     layersList,
