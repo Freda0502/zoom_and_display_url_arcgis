@@ -6,6 +6,7 @@ import {
   DataSourceManager,
   QueriableDataSource,
   styled,
+  Layer,
 } from 'jimu-core'
 import { AllWidgetSettingProps } from 'jimu-for-builder'
 import { Switch } from 'jimu-ui'
@@ -22,18 +23,30 @@ import {
   AllDataSourceTypes,
 } from 'jimu-ui/advanced/data-source-selector'
 import { WebMapDataSourceImpl } from 'jimu-arcgis/lib/data-sources'
+import { useState } from 'react'
 
-var layersList = []
+// var layersList = []
 
 export default function Setting(props: AllWidgetSettingProps<IMConfig>) {
-  const onZoomToLayerPropertyChange = (
-    evt: React.FormEvent<HTMLInputElement>
-  ) => {
+  // const [layersList, setLayersList] = useState<Array<Layer>>([])
+  //test:
+  // const [layersLst, setLayersLst] = useState<Array<Layer>>([])
+
+  const onLayersListAdd = (layers: Layer[]) => {
     props.onSettingChange({
       id: props.id,
-      config: props.config.set('zoomToLayer', evt.currentTarget.checked),
+      config: props.config.set('layersList', layers),
     })
   }
+
+  // const onZoomToLayerPropertyChange = (
+  //   evt: React.FormEvent<HTMLInputElement>
+  // ) => {
+  //   props.onSettingChange({
+  //     id: props.id,
+  //     config: props.config.set('zoomToLayer', evt.currentTarget.checked),
+  //   })
+  // }
 
   const onMapWidgetSelected = (useMapWidgetIds: string[]) => {
     props.onSettingChange({
@@ -66,32 +79,47 @@ export default function Setting(props: AllWidgetSettingProps<IMConfig>) {
     }
   `
 
-  if (
-    props.useDataSources != undefined &&
-    props.useDataSources[0] != undefined
-  ) {
+  if (props.useDataSources && props.useDataSources[0]) {
     const id = props.useDataSources[0].mainDataSourceId
     const dsManager = DataSourceManager.getInstance()
+    // const what = dsManager.getDataSource(id)
+    // what.name
     const mapDataSource = dsManager.getDataSource(id) as WebMapDataSourceImpl
 
     if (mapDataSource && mapDataSource.isDataSourceSet) {
       const dataSourceChildren = mapDataSource.getChildDataSources()
+      const layersList = []
+      console.log('dataSourceChildren', dataSourceChildren)
       for (var i = 0; i < dataSourceChildren.length; i++) {
         const childId = dataSourceChildren[i].id
         const startIndex = childId.indexOf('-')
         const idInput = childId.slice(startIndex + 1)
 
-        if (idInput !== undefined && mapDataSource !== undefined) {
+        if (idInput && mapDataSource) {
+          //dup mapDataSource check ??
           const newUrl = (mapDataSource.getDataSourceByLayer(
             idInput
           ) as QueriableDataSource).url
-          layersList.push(newUrl)
+          //executed way too many times for some reason
+          console.log(
+            'data source contains what properties?',
+            mapDataSource.getDataSourceByLayer(idInput) as QueriableDataSource
+          )
+          // const newName = (mapDataSource.getDataSourceByLayer(
+          //   idInput
+          // ) as QueriableDataSource).name
+          // const newName = mapDataSource.name
+          // cosnt obj={,,}
+          layersList.push({ idInput, newUrl }) //push an obj instead of url
+          // use setLayersList
         }
       }
+      onLayersListAdd(layersList) //3vals sep by caomma
+      console.log('layersList', layersList)
     }
   }
 
-  return [
+  return (
     <StyleDiv>
       <div className='widget-setting-addLayers'>
         <SettingSection
@@ -115,7 +143,7 @@ export default function Setting(props: AllWidgetSettingProps<IMConfig>) {
             defaultMessage: defaultMessages.settings,
           })}
         >
-          <SettingRow>
+          {/* <SettingRow>
             <div className='w-100 addLayers'>
               <div className='checkbox-row'>
                 <label>
@@ -126,11 +154,11 @@ export default function Setting(props: AllWidgetSettingProps<IMConfig>) {
                 </label>
                 <Switch
                   checked={(props.config && props.config.zoomToLayer) || false}
-                  onChange={onZoomToLayerPropertyChange}
+                  // onChange={onZoomToLayerPropertyChange}
                 />
               </div>
             </div>
-          </SettingRow>
+          </SettingRow> */}
         </SettingSection>
 
         <div className='use-feature-layer-setting p-2'>
@@ -144,9 +172,8 @@ export default function Setting(props: AllWidgetSettingProps<IMConfig>) {
           />
         </div>
       </div>
-    </StyleDiv>,
-    layersList,
-  ]
+    </StyleDiv>
+  )
 }
 
-export { layersList }
+// export { layersList }
