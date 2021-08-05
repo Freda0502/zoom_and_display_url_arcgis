@@ -19,10 +19,10 @@
         "0": {
           "type": "WIDGET",
           "bbox": {
-            "left": "12px",
-            "right": "412px",
-            "top": "20px",
-            "bottom": "420px",
+            "left": "0px",
+            "right": "400px",
+            "top": "7px",
+            "bottom": "407px",
             "width": "400px",
             "height": 420
           },
@@ -171,8 +171,8 @@
       "useDataSourcesEnabled": true,
       "useDataSources": [
         {
-          "dataSourceId": "dataSource_1",
-          "mainDataSourceId": "dataSource_1"
+          "dataSourceId": "dataSource_3",
+          "mainDataSourceId": "dataSource_3"
         }
       ]
     }
@@ -184,14 +184,20 @@
   "dataSources": {
     "dataSource_1": {
       "type": "WEB_MAP",
-      "itemId": "fdc5a7e0e44f4b828baf3003f83d85e9",
+      "itemId": "8e644f3d1009443fba86e5fafa5fd8d7",
       "id": "dataSource_1",
       "portalUrl": "https://enterprise.spatialstudieslab.org/portal"
     },
     "dataSource_2": {
       "type": "WEB_MAP",
-      "itemId": "8e644f3d1009443fba86e5fafa5fd8d7",
+      "itemId": "f68893404cdf45b6a6cab1cb9b93a96d",
       "id": "dataSource_2",
+      "portalUrl": "https://enterprise.spatialstudieslab.org/portal"
+    },
+    "dataSource_3": {
+      "type": "WEB_MAP",
+      "itemId": "fdc5a7e0e44f4b828baf3003f83d85e9",
+      "id": "dataSource_3",
       "portalUrl": "https://enterprise.spatialstudieslab.org/portal"
     }
   },
@@ -201,5 +207,5 @@
       "page_0": []
     }
   ],
-  "timestamp": 1628151422688
+  "timestamp": 1628151173822
 }
